@@ -253,19 +253,11 @@ async function timedFetch(url, asJson, ms=8000) {
 }
 
 async function fetchMenuHTML() {
-  const enc = encodeURIComponent('https://dagskammtur.is/matsedill/');
+  // Cloudflare Worker proxy - fetches directly from dagskammtur.is
   try {
-    const j = await timedFetch(`https://api.allorigins.win/get?url=${enc}&t=${Date.now()}`, true);
-    if (j && j.contents && j.contents.length > 500) return j.contents;
-  } catch(e) {}
-  try {
-    const t = await timedFetch(`https://corsproxy.io/?url=${enc}`, false);
+    const t = await timedFetch('https://square-base-63de.r57ymhc9w9.workers.dev/', false);
     if (t && t.length > 500) return t;
-  } catch(e) {}
-  try {
-    const t = await timedFetch(`https://api.codetabs.com/v1/proxy?quest=https://dagskammtur.is/matsedill/`, false);
-    if (t && t.length > 500) return t;
-  } catch(e) {}
+  } catch(e) { console.warn('Worker fetch failed', e.message); }
   return null;
 }
 
